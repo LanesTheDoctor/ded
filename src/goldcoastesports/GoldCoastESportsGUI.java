@@ -1,8 +1,7 @@
-package goldcoastesports;
 /*
     File name: GoldCoastESportsGUI.java
     Purpose: Create the GUI Window Application
-             Provide all of the application.
+    Provide all of the application.
     Author: Zac Makkinga
     Date: 25/08/2024
     Version: 1.0
@@ -33,8 +32,9 @@ package goldcoastesports;
         6.1 When app is closed, provide optin ofr user to save chagnes (competitionList, teamList).
         6.2 Save (write) to 2x external csv files the data from: ArrayListCompetition> competitionList ArrayList<Team> teamList
 */
+package goldcoastesports;
 
-import java.io.BufferedReader;
+import java.io.BufferedReader; 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -43,12 +43,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import goldcostesports.Competition;
 /*
+import goldcoastesports.Competition;
 import goldcoastesports.saveCompetitionData();
 import goldcoastesports.saveTeamData();
 import goldcoastesports.resizeTableColumns();
@@ -56,16 +57,138 @@ import goldcoastesports.validateNewTeam();
 import goldcoastesports.displayCompetitions();
 import goldcoastesports.readTeamData();
 import goldcoastesports.readCompetitionData();
-import goldcoastesports.resizeTableColumns();
 import goldcoastesports.displayTeamDetails();
 import goldcoastesports.displayTeams();
 import goldcoastesports.initComponents();
 */
 
-private boolean validateNewTeam()
+public class GoldCoastESportsGUI extends javax.swing.JFrame
+{
+    //in the arrow brackets are the classes
+    private ArrayList<Competition> competitionList;
+    
+    private ArrayList<Team> teamList;
+    
+    boolean comboBoxStatus;
+    
+    private DefaultTableModel compResultsTableModel;
+    
+    //constructor
+    public GoldCoastESportsGUI()
+        {
+            //ititialise private data fields
+            initComponents();
+            competitionList = new ArrayList<Competition>();
+            teamList = new ArrayList<Team>();
+            comboBoxStatus = false;
+            compResultsTableModel = new DefaultTableModel();
+
+            //customise table model
+            String [] columnName_Results = new String []
+                {
+                    "Date", "Location", "Game", "Team", "Points"
+                };
+
+            compResultsTableModel.setColumnIdentifiers(columnName_Results);
+
+            ArrayList<Team> teamList = TeamPointsUtil.loadTeamsFromExcel("teams.xlsx");
+            TeamPointsUtil.calculateTotalPoints(teamList, "competitions.csv");
+
+            DefaultComboBoxModel<Strings> comboBoxModel = new DefaultComboBoxModel<>();
+            for (Team team : teamList)
+                {
+                    comboBoxModel.addelement(team.getName());
+                }
+
+            addNewCompResultComboBox_JPanel.setModel(comboBoxModel);
+            updateTeamComboBox_JPanel.setModel(comboBoxModel);
+
+            for (Team team : teamList)
+                {
+                    System.out.println(team);
+                }
+
+            //initialise all swing controls
+            initComponents();
+
+            //customise table columns
+            resizeTableColumns();
+
+            //read external csv files
+            readCompetitionData();
+            readTeamData();
+
+            //display comp data in table
+            displayCompetitions();
+
+            //display teams in comboboxes
+            displayTeams();
+
+
+            //display team details in jtextfields with team combo boxes
+            displayTeamDetails();
+                // work out urself
+
+            //reset comoboboxstatus to be true (finished with updating comboboxes)
+            comboBoxStatus = true;
+        }
+
+        
+        
+    private void resizeTableColumns()
+        {
+            double[] columnWidthPercentage = {0.2f, 0.2f, 0.3f, 0.2f, 0.1f};
+            int tableWidth = compResults_Table.getWidth();
+            TableColumn column;
+            TableColumnModel tableColumnModel = compResults_Table.getColumnModel();
+            int cantCols = tableColumnModel.getColumnCount();
+            for (int i = 0; i < cantCols; i++)
+            {
+                column = tableColumnModel.getColumn(i);
+                float pWidth = Math.round(columnWidthPercentage[i] * tableWidth);
+                column.setPreferredWidth((int)pWidth);
+            }
+        }
+
+    private void displayTeams() 
+        {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+    private void displayTeamDetails() 
+        {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+ /**************************
+     Method: readCompetitionData()
+     Purpose: reads the competitions.csv file
+     * and populates objects created from the competition class
+     * 
+     
+     * Inputs: void
+     * Output: void
+     ***********************/
+
+     /*****
+      * Method: validateNewTeam()
+      * Purpose: basic validation of user inputs when creating a new team
+      * - rejects empty text fields for the team name, contact person, phone email
+      * - uses boolean validation to track the status of the validation
+      * - uses JOptionPane to create a pop-up window if validation is false to advise user of errors
+      * Inputs: void
+      * outputs: returns boolean validation (true if all fields contain strings, false if any contain nothing
+      * 
+      * this is basically a validation method
+      */
+
+
+
+
+    private boolean validateNewTeam()
         {
             boolean validation;
-        
+
             String errorMsg = "Error(s) encountered!\n";
 
             if (newTeamName_TextField.getText().isEmpty())
@@ -94,112 +217,6 @@ private boolean validateNewTeam()
             return validation;
         }
 
-
-
-public class GoldCoastESportsGUI extends javax.swing.JFrame
-{
-    //in the arrow brackets are the classes
-    private ArrayList<Competition> competitionList;
-    
-    private ArrayList<Team> teamList;
-    
-    boolean comboBoxStatus;
-    
-    private DefaultTableModel compResultsTableModel;
-    
-    
-    
-    //constructor
-    public GoldCoastESportsGUI()
-    {
-        //ititialise private data fields
-        initComponents();
-        competitionList = new ArrayList<Competition>();
-        teamList = new ArrayList<Team>();
-        comboBoxStatus = false;
-        compResultsTableModel = new DefaultTableModel();
-        
-        //customise table model
-        String [] columnName_Results = new String []
-            {
-                "Date", "Location", "Game", "Team", "Points"
-            };
-        
-        compResultsTableModel.setColumnIdentifiers(columnName_Results);
-        
-        //initialise all swing controls
-        initComponents();
-        
-        //customise table columns
-        resizeTableColumns();
-        
-        //read external csv files
-        readCompetitionData();
-        readTeamData();
-        
-        //display comp data in table
-        displayCompetitions();
-        
-        //display teams in comboboxes
-        displayTeams();
-            // work out urself
-        
-        //display team details in jtextfields with team combo boxes
-        displayTeamDetails();
-            // work out urself
-        
-        //reset comoboboxstatus to be true (finished with updating comboboxes)
-        comboBoxStatus = true;
-    }
-
-    private void resizeTableColumns()
-    {
-        double[] columnWidthPercentage = {0.2f, 0.2f 0.3f, 0.2f, 0.1f};
-        int tableWidth = compResults_Table.getWidth();
-        TableColumn column;
-        TableColumnModel tableColumnModel = compResults_Table.getColumnModel();
-        int cantCols = tableColumnModel.getColumnCount();
-        for (int i = 0; i < cantCols; i++)
-        {
-            column = tableColumnModel.getColumn(i);
-            float pWidth = Math.round{columnWidthPercentage[i] * tableWidth}
-            column.setPreferredWidth((int)pWidth);
-        }
-
-        private void displayTeams() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-
-        private void displayTeamDetails() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
-
- /**************************
-     Method: readCompetitionData()
-     Purpose: reads the competitions.csv file
-     * and populates objects created from the competition class
-     * 
-     
-     * Inputs: void
-     * Output: void
-     ***********************/
-
-     /*****
-      * Method: validateNewTeam()
-      * Purpose: basic validation of user inputs when creating a new team
-      * - rejects empty text fields for the team name, contact person, phone email
-      * - uses boolean validation to track the status of the validation
-      * - uses JOptionPane to create a pop-up window if validation is false to advise user of errors
-      * Inputs: void
-      * outputs: returns boolean validation (true if all fields contain strings, false if any contain nothing
-      * 
-      * this is basically a validation method
-      */
-  
-
-
-
     private void readCompetitionData()
         {
             try
@@ -212,7 +229,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                     String line;
                     //4. loop throough each line in the external file
                     // until end of file is reached (EOF)
-                    while ((line = bufferedReader.readLine() != not null)
+                    while ((line = bufferedReader.readLine()) != null)
                     {
                         //check line
                         //System.out.println(line);
@@ -222,12 +239,12 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                                 //"League of Legends" is set up in the linArray [0]
                                 //"TAFE coomera" is set up in lineArray[1]
                                 //"12_jan-2024" is set up in lineArray[2]
-                                String [] lineArrray = line.split(",");
+                                String [] lineArray = line.split(",");
                                 //set up individual variables ofr ecah split line component
                                 String game = lineArray[0];
                                 String location = lineArray[1];
                                 String compDate = lineArray[2];
-                                String team = lineArrayn[3];
+                                String team = lineArray[3];
                                 // "2" is converted to an actual integer
                                 int points = Integer.parseInt(lineArray[4]);
                                 //create competition instance
@@ -267,9 +284,9 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         }
 
     private void readTeamData()
-    {
+        {
 
-    }
+        }
 
  /**************************
      Method: displayCompetitions()
@@ -278,57 +295,222 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
      * Output: void
      ***********************/
 
+     public classs TeamPointsCalculator
+        {
+           public static ArrayList<Team> loadTeamsFromExcel(String excelFilePath)
+                {
+                    ArrayList<Team> teamList = new ArrayList<>();
+                    
+                    try(FileInputStream fis = new FileInputStream(excelFilePath);
+                        Workbook workbook = new XSSWorkBook(fis))
+                            {
+                                Sheet sheet = workbook.getSheetat(0);
 
-    private void displayCompetitions()
-    {
-        //populate compeition data into JTable
-        if (competitionList.size() > 0)
-            {
-                // create Object[] [] @-D array for JTable
-                Object[][] comp2DArray = new Object[competitionList.size][];
-                //populate 2-D array with the competitions
-                for (int i= 0; i < competitionList.size(); i++)
+                                for (Row row : sheet)
+                                    {
+                                        Cell cell = row.getCell(0);
+                                        if ( cell != null && cell.getCellType() == CellType.STRING)
+                                            {
+                                                String teamName = cell.getStringCellValue();
+                                                teamList.add(new Team(teamName));
+                                            }
+                                    }
+                            }
+                            
+                    catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        
+                    return teamList;
+                }
+
+                public static void calculateTotalPoints(ArrayList<Team> teamList, String csvFilePath)
                     {
-                        //create single dimensional Object [] array --- 1 competition (for row)
-                        Object[] comp = new Object[5];
-                        // date
-                        comp[0] = competitionList.get(i).getCompetitionDate();
-                        // location
-                        comp[1] = competitionList.get(i).getLocation();
-                        // game
-                        comp[2] = competitionList.get(i).getGame;
-                        // team
-                        comp[3] = competitionList.get(i).getTeam;
-                        // points
-                        comp[4] = competitionList.get(i).getPoints();
-                        // append comp to the 2D array comp2Drray
-                        comp2DArray[i] = comp;
+                        Map<String, Integer> teamPointsMap = new hashMap<>();
+
+                        for (Team team : teamList)
+                            {
+                                teamPointsMap.put(team.getName(),0);
+                            }
+
+                            try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath)))
+                                {
+                                    String line;
+                                    while ((line = br.readLine()) != null)
+                                        {
+                                            String[] columns = line.split(",");
+
+                                            if (columns.length > 4)
+                                                {
+                                                    String teamName = columns[0];
+
+                                                    int points;
+
+                                                    try
+                                                        {
+                                                            points = Integer.parseInt(columns[4]);
+                                                        }
+                                                        
+                                                    continue;
+                                                }
+                                            if (teamPointsMap.containsKey(teamName))
+                                                {
+                                                    teamPointsMap.put(teamname, teamPointsMap.get(teamName + points));
+                                                }
+                                        }
+                                }
                     }
 
-
-                    // remove all existing rows in the JTables (if there are any)
-                    if (compResultsTableModel.getRowCount() > 0)
+                    catch (IOException e)
                         {
-                            for (int i = compResultsTableModel.getRowCount() - 1; i >= 0; i--)
+                            e.printStackTrace();
+                        }
+                    for (Team team : teamList)
+                        {
+                            String name = team.getName();
+                            if (teamPointsMap.containsKey(name))
                                 {
-                                    compResultsTableModel.removeRow(i);
+                                    team.addPoints(teamPointsMap.get(name));
                                 }
                         }
+        }
 
-                        // put 2D array of competition data into JTable
-                        if (comp2DArray.length > 0)
-                        {
-                            //add data to tableModel
-                            for (int row = 0; row < comp2DArray.length; row++)
-                                {
-                                    compResultsTableModel.addRow(comp2DArray[row]);
-                                }
-                        }
 
-                        //update table model
-                        compResultsTableModel.fireTableDataChanged();
+
+
+
+    public class Team
+        {
+            private String name;
+            private int totalPoints;
+        
+            public Team(String name)
+                {
+                    this.name = name;
+                    this.totalPoints = 0;
+                }
+            
+            public String getName()
+                {
+                    return name;
+                }
+
+            public int getTotalPoints()
+                {
+                    return totalPoints;
+                }
+            
+            public void addPoints(int points)
+                {
+                    this.totalPoints += points;
+                }
+            
+            @Override
+            public string toString()
+                {
+                    return name + ": " + totalPoints + " points";
+                }
+        }
+    
+    private void displayTeams()
+    {
+        String csvFile = "competitions.csv";
+        String line;
+        String[] columnNames = null;
+        DefaultTableModel model = new DefaultTableModel();
+        
+        Set<String> uniqueValues = new Hashset<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile)))
+        {
+            if ((line = br.readLine()) !=)
+            {
+                columnNames = line.split(",");
+                model.setColumnIdentifiers(ColumnNames);
+            }
+            
+            while ((line = br.readLine() != null))
+            {
+                String[] rowData = line.split(",");
+                model.addRow(rowData);
+                
+                if (rowData.length > 0)
+                    {
+                        uniqueValues.add(rowData[0]);
+                    }
+            }
+        }
+        
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        //send data to jtable
+        compResults_JTable.setModel(model);
+
+        //update the combo boxes
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(uniqueValues.toArray(new String[0]));
+        addNewCompResultComboBox_JPanel.setModel(comboBoxModel);
+        updateTeamComboBox_JPanel.setModel(comboBoxModel);
+
+        public static void main(String[] args)
+            {
+                SwingUtilities.invokeLater(() -> new GoldCoastESports().setVisible(true));
             }
     }
+
+    private void displayCompetitions()
+        {
+            //populate compeition data into JTable
+            if (competitionList.size() > 0)
+                {
+                    // create Object[] [] @-D array for JTable
+                    Object[][] comp2DArray = new Object[competitionList.size()][];
+                    //populate 2-D array with the competitions
+                    for (int i= 0; i < competitionList.size(); i++)
+                        {
+                            //create single dimensional Object [] array --- 1 competition (for row)
+                            Object[] comp = new Object[5];
+                            // date
+                            comp[0] = competitionList.get(i).getCompetitionDate();
+                            // location
+                            comp[1] = competitionList.get(i).getLocation();
+                            // game
+                            comp[2] = competitionList.get(i).getGame();
+                            // team
+                            comp[3] = competitionList.get(i).getTeam();
+                            // points
+                            comp[4] = competitionList.get(i).getPoints();
+                            // append comp to the 2D array comp2Drray
+                            comp2DArray[i] = comp;
+                        }
+
+
+                        // remove all existing rows in the JTables (if there are any)
+                        if (compResultsTableModel.getRowCount() > 0)
+                            {
+                                for (int i = compResultsTableModel.getRowCount() - 1; i >= 0; i--)
+                                    {
+                                        compResultsTableModel.removeRow(i);
+                                    }
+                            }
+
+                            // put 2D array of competition data into JTable
+                            if (comp2DArray.length > 0)
+                            {
+                                //add data to tableModel
+                                for (int row = 0; row < comp2DArray.length; row++)
+                                    {
+                                        compResultsTableModel.addRow(comp2DArray[row]);
+                                    }
+                            }
+
+                            //update table model
+                            compResultsTableModel.fireTableDataChanged();
+                }
+        }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -428,7 +610,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("Team Competition Results");
 
-        compResults_JTable.setModel(compResultsTabelModel);
+        compResults_JTable.setModel(compResultsTableModel);
         jScrollPane1.setViewportView(compResults_JTable);
 
         displayTeamResults_Button.setText("DISPLAY TEAM RESULTS");
@@ -832,7 +1014,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                 String newContactPhone = newContactPhone_TextField.getText();
                 String newContactEmail = newContactEmail_TextField.getText();
 
-                int yesOrNo = JOptionPain.showConfirmDialog(null,"You are about to add a new team: " + newTeamName + "." + "\n" + 
+                int yesOrNo = JOptionPane.showConfirmDialog(null,"You are about to add a new team: " + newTeamName + "." + "\n" + 
                 "Do you wish to proceed, yes or no?", "Add new team",
                 JOptionPane.YES_NO_OPTION);
 
@@ -877,25 +1059,23 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     */
 
         
-    if (comboBoxStatus == true)
+        if (comboBoxStatus == true)
         {
             displayTeamDetails();
         }
-        
-
-    
-
     }//GEN-LAST:event_updateTeamComboBox_JPanelItemStateChanged
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-/****
- * method: formWindowClosing()
- * purpose: event handler method called whenever the app is closed from clicking the x button
- * inputs: WindowEvent evt (the event object passed into the formWindowClosing() method)
- * outputs: void
- */     
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {
 
-// TODO add your handling code here:
+//GEN-FIRST:event_formWindowClosing
+    /****
+     * method: formWindowClosing()
+     * purpose: event handler method called whenever the app is closed from clicking the x button
+     * inputs: WindowEvent evt (the event object passed into the formWindowClosing() method)
+     * outputs: void
+     */     
+
+    // TODO add your handling code here:
 
     int yesOrNo = JOptionPane.showConfirmDialog(null, "Do you wish to save changes before closing, sarrr?", "SAVE CHANGES", JOptionPane.YES_NO_OPTION);
 
@@ -906,11 +1086,11 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
             //save team data
             //saveTeamData();
         }
-
     else
         {
             // exit wihout saving
         }
+    }
 
     private void saveCompetitionData()
         {
@@ -922,7 +1102,8 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
         }
 
-    }//GEN-LAST:event_formWindowClosing
+
+//GEN-LAST:event_formWindowClosing
 
     //leave this area alone
     
@@ -1018,7 +1199,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     private javax.swing.JPanel updateexistingTeam_JPanel;
     // End of variables declaration//GEN-END:variables
 
-    private void resizeTableColumns() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    // private void resizeTableColumns() {
+    //     throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // }
 }
