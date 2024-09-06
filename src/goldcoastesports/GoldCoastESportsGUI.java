@@ -34,8 +34,19 @@
 */
 package goldcoastesports;
 
+import java.util.HashSet; 
+import java.util.HashMap;
+
+import org.apache.poi.hssf.usermodel.HSSFSheet;  
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;  
+import org.apache.poi.ss.usermodel.Cell;  
+import org.apache.poi.ss.usermodel.FormulaEvaluator;  
+import org.apache.poi.ss.usermodel.Row;  
+
+import java.io.File;  
 import java.io.BufferedReader; 
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -45,22 +56,13 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-/*
+// // import goldcoastesports.GoldCoastESportsGUI.Team;
+import goldcoastesports.Team;
 import goldcoastesports.Competition;
-import goldcoastesports.saveCompetitionData();
-import goldcoastesports.saveTeamData();
-import goldcoastesports.resizeTableColumns();
-import goldcoastesports.validateNewTeam();
-import goldcoastesports.displayCompetitions();
-import goldcoastesports.readTeamData();
-import goldcoastesports.readCompetitionData();
-import goldcoastesports.displayTeamDetails();
-import goldcoastesports.displayTeams();
-import goldcoastesports.initComponents();
-*/
 
 public class GoldCoastESportsGUI extends javax.swing.JFrame
 {
@@ -69,7 +71,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     
     private ArrayList<Team> teamList;
     
-    boolean comboBoxStatus;
+    private boolean comboBoxStatus;
     
     private DefaultTableModel compResultsTableModel;
     
@@ -94,10 +96,10 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
             ArrayList<Team> teamList = TeamPointsUtil.loadTeamsFromExcel("teams.xlsx");
             TeamPointsUtil.calculateTotalPoints(teamList, "competitions.csv");
 
-            DefaultComboBoxModel<Strings> comboBoxModel = new DefaultComboBoxModel<>();
+            DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
             for (Team team : teamList)
                 {
-                    comboBoxModel.addelement(team.getName());
+                    comboBoxModel.addElement(team.getName());
                 }
 
             addNewCompResultComboBox_JPanel.setModel(comboBoxModel);
@@ -124,7 +126,6 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
             //display teams in comboboxes
             displayTeams();
 
-
             //display team details in jtextfields with team combo boxes
             displayTeamDetails();
                 // work out urself
@@ -138,9 +139,9 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     private void resizeTableColumns()
         {
             double[] columnWidthPercentage = {0.2f, 0.2f, 0.3f, 0.2f, 0.1f};
-            int tableWidth = compResults_Table.getWidth();
+            int tableWidth = compResults_Table.getWidth(); //TODO are these supposed to be compResultsTableModel.getWidth();??
             TableColumn column;
-            TableColumnModel tableColumnModel = compResults_Table.getColumnModel();
+            TableColumnModel tableColumnModel = compResults_Table.getColumnModel();  //TODO are these supposed to be compResultsTableModel.getColumnModel();??
             int cantCols = tableColumnModel.getColumnCount();
             for (int i = 0; i < cantCols; i++)
             {
@@ -149,11 +150,11 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                 column.setPreferredWidth((int)pWidth);
             }
         }
-
-    private void displayTeams() 
-        {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
+        
+    // private void displayTeams() // TODO: DUPLICATE METHOD
+    //     {
+    //         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    //     }
 
     private void displayTeamDetails() 
         {
@@ -288,21 +289,21 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
         }
 
- /**************************
-     Method: displayCompetitions()
-     Purpose: display competitions from ArrayList in JTable
+/**************************
+    Method: displayCompetitions()
+    Purpose: display competitions from ArrayList in JTable
      * Inputs: void
      * Output: void
      ***********************/
 
-     public classs TeamPointsCalculator
+    public class TeamPointsCalculator
         {
-           public static ArrayList<Team> loadTeamsFromExcel(String excelFilePath)
+            public static ArrayList<Team> loadTeamsFromExcel(String excelFilePath)
                 {
                     ArrayList<Team> teamList = new ArrayList<>();
                     
                     try(FileInputStream fis = new FileInputStream(excelFilePath);
-                        Workbook workbook = new XSSWorkBook(fis))
+                        Workbook workbook = new XSSFWorkbook(fis))
                             {
                                 Sheet sheet = workbook.getSheetat(0);
 
@@ -327,7 +328,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
                 public static void calculateTotalPoints(ArrayList<Team> teamList, String csvFilePath)
                     {
-                        Map<String, Integer> teamPointsMap = new hashMap<>();
+                        HashMap<String, Integer> teamPointsMap = new HashMap<String, Integer>();
 
                         for (Team team : teamList)
                             {
@@ -340,45 +341,34 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                                     while ((line = br.readLine()) != null)
                                         {
                                             String[] columns = line.split(",");
+                                            String teamName = columns[0];
+                                            int points = 0; // I had to initilise variable to remove errors. 
 
                                             if (columns.length > 4)
                                                 {
-                                                    String teamName = columns[0];
-
-                                                    int points;
-
-                                                    try
-                                                        {
-                                                            points = Integer.parseInt(columns[4]);
-                                                        }
-                                                        
-                                                    continue;
+                                                    points = Integer.parseInt(columns[4]);    
                                                 }
                                             if (teamPointsMap.containsKey(teamName))
                                                 {
-                                                    teamPointsMap.put(teamname, teamPointsMap.get(teamName + points));
+                                                    teamPointsMap.put(teamName, teamPointsMap.get(teamName + points));
                                                 }
                                         }
                                 }
+                                catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+            
+                                for (Team team : teamList)
+                                    {
+                                        String name = team.getName();
+                                        if (teamPointsMap.containsKey(name))
+                                            {
+                                                team.addPoints(teamPointsMap.get(name));
+                                            }
+                                    }
                     }
-
-                    catch (IOException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    for (Team team : teamList)
-                        {
-                            String name = team.getName();
-                            if (teamPointsMap.containsKey(name))
-                                {
-                                    team.addPoints(teamPointsMap.get(name));
-                                }
-                        }
         }
-
-
-
-
 
     public class Team
         {
@@ -407,30 +397,60 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                 }
             
             @Override
-            public string toString()
+            public String toString()
                 {
                     return name + ": " + totalPoints + " points";
                 }
         }
     
+    public static void ExportTeamsToCSV(ArrayList<Team> teamList String csvFilePath)
+        {
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath)))
+            {
+                writer.write("Name, Total Points");
+                writer.newLine();
+                
+                for (Team taem : teamList)
+                {
+                    String name = team.getName();
+                    int totalPoints = team.getTotalPoints();
+                    
+                    String line = String.format("%s,%d", name totalPoints);
+                    writer.write(line);
+                    writer.newLine();
+                }
+                
+                System.out.println("Data successfully exorter to " + csvFilePath);
+            }
+            
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                System.out.println("An error occurred while exporting data.");
+            }
+        }
+
+    
+    
+    
     private void displayTeams()
     {
-        String csvFile = "competitions.csv";
+        String csvFile = "competitions.csv"; // You need to give this a proper file url
         String line;
         String[] columnNames = null;
         DefaultTableModel model = new DefaultTableModel();
         
-        Set<String> uniqueValues = new Hashset<>();
+        HashSet<String> uniqueValues = new HashSet<String>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile)))
         {
-            if ((line = br.readLine()) !=)
+            if ((line = br.readLine()) != null)
             {
                 columnNames = line.split(",");
-                model.setColumnIdentifiers(ColumnNames);
+                model.setColumnIdentifiers(columnNames);
             }
             
-            while ((line = br.readLine() != null))
+            while ((line = br.readLine()) != null)
             {
                 String[] rowData = line.split(",");
                 model.addRow(rowData);
@@ -454,12 +474,12 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(uniqueValues.toArray(new String[0]));
         addNewCompResultComboBox_JPanel.setModel(comboBoxModel);
         updateTeamComboBox_JPanel.setModel(comboBoxModel);
-
-        public static void main(String[] args)
-            {
-                SwingUtilities.invokeLater(() -> new GoldCoastESports().setVisible(true));
-            }
     }
+        // public static void main(String[] args) 
+        //     {
+        //         SwingUtilities.invokeLater(() -> new GoldCoastESports().setVisible(true));
+        //     }
+    
 
     private void displayCompetitions()
         {
@@ -1132,10 +1152,8 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GoldCoastESportsGUI().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new GoldCoastESportsGUI().setVisible(true);
         });
     }
     
@@ -1199,7 +1217,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     private javax.swing.JPanel updateexistingTeam_JPanel;
     // End of variables declaration//GEN-END:variables
 
-    // private void resizeTableColumns() {
+    // private void resizeTableColumns() { TODO: DUPLICATE METHOD
     //     throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     // }
 }
