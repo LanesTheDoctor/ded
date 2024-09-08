@@ -36,14 +36,15 @@ package goldcoastesports;
 
 import java.util.HashSet; 
 import java.util.HashMap;
-
+/*
 import org.apache.poi.hssf.usermodel.HSSFSheet;  
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;  
 import org.apache.poi.ss.usermodel.Cell;  
 import org.apache.poi.ss.usermodel.FormulaEvaluator;  
 import org.apache.poi.ss.usermodel.Row;  
-
+*/
 import java.io.File;  
+import java.io.FileWriter;
 import java.io.BufferedReader; 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -85,6 +86,16 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
             comboBoxStatus = false;
             compResultsTableModel = new DefaultTableModel();
 
+            
+            
+            newTeamName_TextField = new JTextField();
+         newContactPerson_TextField = new JTextField();
+          newContactPhone_TextField = new JTextField();
+          newContactEmail_TextField = new JTextField();
+            
+            
+            
+            
             //customise table model
             String [] columnName_Results = new String []
                 {
@@ -132,8 +143,127 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
             //reset comoboboxstatus to be true (finished with updating comboboxes)
             comboBoxStatus = true;
+            
+            
+            
+            
         }
+package goldcoastesports;
 
+import java.util.HashSet; 
+import java.util.HashMap;
+/*
+import org.apache.poi.hssf.usermodel.HSSFSheet;  
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;  
+import org.apache.poi.ss.usermodel.Cell;  
+import org.apache.poi.ss.usermodel.FormulaEvaluator;  
+import org.apache.poi.ss.usermodel.Row;  
+*/
+import java.io.File;  
+import java.io.FileWriter;
+import java.io.BufferedReader; 
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+// // import goldcoastesports.GoldCoastESportsGUI.Team;
+import goldcoastesports.Team;
+import goldcoastesports.Competition;
+
+public class GoldCoastESportsGUI extends javax.swing.JFrame
+{
+    //in the arrow brackets are the classes
+    private ArrayList<Competition> competitionList;
+    
+    private ArrayList<Team> teamList;
+    
+    private boolean comboBoxStatus;
+    
+    private DefaultTableModel compResultsTableModel;
+    
+    //constructor
+    public GoldCoastESportsGUI()
+        {
+            //ititialise private data fields
+            initComponents();
+            competitionList = new ArrayList<Competition>();
+            teamList = new ArrayList<Team>();
+            comboBoxStatus = false;
+            compResultsTableModel = new DefaultTableModel();
+
+            
+            
+            newTeamName_TextField = new JTextField();
+         newContactPerson_TextField = new JTextField();
+          newContactPhone_TextField = new JTextField();
+          newContactEmail_TextField = new JTextField();
+            
+            
+            
+            
+            //customise table model
+            String [] columnName_Results = new String []
+                {
+                    "Date", "Location", "Game", "Team", "Points"
+                };
+
+            compResultsTableModel.setColumnIdentifiers(columnName_Results);
+
+            ArrayList<Team> teamList = TeamPointsUtil.loadTeamsFromExcel("teams.xlsx");
+            TeamPointsUtil.calculateTotalPoints(teamList, "competitions.csv");
+
+            DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
+            for (Team team : teamList)
+                {
+                    comboBoxModel.addElement(team.getName());
+                }
+
+            addNewCompResultComboBox_JPanel.setModel(comboBoxModel);
+            updateTeamComboBox_JPanel.setModel(comboBoxModel);
+
+            for (Team team : teamList)
+                {
+                    System.out.println(team);
+                }
+
+            //initialise all swing controls
+            initComponents();
+
+            //customise table columns
+            resizeTableColumns();
+
+            //read external csv files
+            readCompetitionData();
+            readTeamData();
+
+            //display comp data in table
+            displayCompetitions();
+
+            //display teams in comboboxes
+            displayTeams();
+
+            //display team details in jtextfields with team combo boxes
+            displayTeamDetails();
+                // work out urself
+
+            //reset comoboboxstatus to be true (finished with updating comboboxes)
+            comboBoxStatus = true;
+            
+            
+            
+            
+        }
         
         
     private void resizeTableColumns()
@@ -289,6 +419,41 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
         }
 
+    
+    public class TeamPointsUtil {
+
+    // Method to load teams from an Excel file
+    public static ArrayList<Team> loadTeamsFromExcel(String filename) {
+        ArrayList<Team> teamList = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(new File(filename));
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Assuming data is in the first sheet
+            for (Row row : sheet) {
+                // Skip header row
+                if (row.getRowNum() == 0) continue;
+
+                String name = row.getCell(0).getStringCellValue();
+                String contactPerson = row.getCell(1).getStringCellValue();
+                String contactPhone = row.getCell(2).getStringCellValue();
+                String contactEmail = row.getCell(3).getStringCellValue();
+                int points = (int) row.getCell(4).getNumericCellValue(); // Example column for points
+
+                Team team = new Team(name, contactPerson, contactPhone, contactEmail, points);
+                teamList.add(team);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return teamList;
+    }
+    
+    
+    
+    
+    
+    
 /**************************
     Method: displayCompetitions()
     Purpose: display competitions from ArrayList in JTable
@@ -370,7 +535,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                     }
         }
 
-    public class Team
+    /*public class Team
         {
             private String name;
             private int totalPoints;
@@ -402,20 +567,21 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                     return name + ": " + totalPoints + " points";
                 }
         }
-    
-    public static void ExportTeamsToCSV(ArrayList<Team> teamList String csvFilePath)
+    */
+
+    public static void ExportTeamsToCSV(ArrayList<Team> teamList, String csvFilePath)
         {
             try(BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath)))
             {
                 writer.write("Name, Total Points");
                 writer.newLine();
                 
-                for (Team taem : teamList)
+                for (Team team : teamList)
                 {
                     String name = team.getName();
                     int totalPoints = team.getTotalPoints();
                     
-                    String line = String.format("%s,%d", name totalPoints);
+                    String line = String.format("%s, %d", name, totalPoints);
                     writer.write(line);
                     writer.newLine();
                 }
@@ -429,9 +595,6 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
                 System.out.println("An error occurred while exporting data.");
             }
         }
-
-    
-    
     
     private void displayTeams()
     {
@@ -1057,7 +1220,20 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
 
 
+ public class Competition {
+        private String teamId;
+        private int points;
+    }
 
+    ArrayList<Competition> competitionList = new ArrayList<>();
+
+    public void addCompResult(Competition competition) {
+        competitionList.add(competition);
+
+    }
+
+    public void displayLeaderboard() {
+    }
 
 
     }//GEN-LAST:event_addNewTeam_ButtonActionPerformed
@@ -1068,6 +1244,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
 
     private void updateTeamComboBox_JPanelItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_updateTeamComboBox_JPanelItemStateChanged
         // TODO add your handling code here:
+   
 
             /*
     Method: updateTeam_ComboBoxItemStateChanged()
@@ -1102,9 +1279,9 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
     if (yesOrNo ==JOptionPane.YES_OPTION)
         {
             //save compeition data
-            //saveCompetionData();
+            saveCompetionData();
             //save team data
-            //saveTeamData();
+            saveTeamData();
         }
     else
         {
@@ -1112,15 +1289,30 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         }
     }
 
-    private void saveCompetitionData()
-        {
-            //somehow work these out
+ 
+    private void saveCompetitionData() {
+    try (PrintWriter writer = new PrintWriter(new FileWriter("competitionData.txt"))) {
+        for (Competition competition : competitionList) {
+            writer.println(competition.getTeamId() + "," + competition.getPoints());
         }
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Failed to save competition data.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
-    private void saveTeamData()
-        {
-
+private void saveTeamData() {
+    try (PrintWriter writer = new PrintWriter(new FileWriter("teamData.txt"))) {
+        for (Team team : teamList) {
+            writer.println(team.getName() + "," + team.getContactPerson() + "," +
+                          team.getContactPhone() + "," + team.getContactEmail());
         }
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Failed to save team data.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
 
 
 //GEN-LAST:event_formWindowClosing
@@ -1155,7 +1347,7 @@ public class GoldCoastESportsGUI extends javax.swing.JFrame
         java.awt.EventQueue.invokeLater(() -> {
             new GoldCoastESportsGUI().setVisible(true);
         });
-    }
+    
     
      //leave this area alone
 
